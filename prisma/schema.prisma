@@ -18,7 +18,7 @@ model User {
   email         String   @unique
   password      String
   username      String   @unique
-  bio           String?
+  bio           String   @default("Avaliable")
   profilePicUrl String   @default("https://static.vecteezy.com/system/resources/previews/003/337/584/large_2x/default-avatar-photo-placeholder-profile-icon-vector.jpg")
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
