@@ -1,7 +1,7 @@
 type SuccessResponse = {
   success: true;
   message: string;
-  data: unknown;
+  data?: unknown;
   cause?: never;
 };
 

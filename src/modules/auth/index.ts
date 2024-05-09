@@ -4,7 +4,7 @@ import { loginSchema, refreshSchema, registerSchema } from "./schemas";
 import { db } from "../../shared/db";
 import { Response } from "../../shared/types/Response";
 import { randomBytes } from "crypto";
-import { sign } from "hono/jwt";
+import { jwt, sign, verify } from "hono/jwt";
 import { JwtPayload } from "./types";
 
 const app = new Hono();
@@ -76,7 +76,11 @@ app.post("/login", zValidator("json", loginSchema), async (c) => {
   };
 
   const accessToken = await sign(
-    { ...payload, exp: Date.now() * 60 * 60 * 24, iat: Date.now() },
+    {
+      ...payload,
+      exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24,
+      iat: Math.floor(Date.now() / 1000),
+    },
     process.env.JWT_SECRET
   );
 
@@ -138,7 +142,11 @@ app.post("/refresh", zValidator("json", refreshSchema), async (c) => {
   const payload: JwtPayload = { id: userId, username: existingUser.username };
 
   const newAccessToken = await sign(
-    { ...payload, exp: Date.now() * 60 * 60 * 24, iat: Date.now() },
+    {
+      ...payload,
+      exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24,
+      iat: Math.floor(Date.now() / 1000),
+    },
     process.env.JWT_SECRET
   );
 
@@ -156,6 +164,30 @@ app.post("/refresh", zValidator("json", refreshSchema), async (c) => {
       refreshToken: newRefreshToken,
     },
   });
+});
+
+app.get("/logout", jwt({ secret: process.env.JWT_SECRET }), async (c) => {
+  const payload: JwtPayload = c.get("jwtPayload");
+
+  try {
+    await db.user.update({
+      where: { id: payload.id, NOT: [{ refreshToken: null }] },
+      data: { refreshToken: null },
+    });
+
+    return c.json<Response, 200>({
+      success: true,
+      message: "Logged out successfully",
+    });
+  } catch (error) {
+    console.error(error);
+
+    return c.json<Response, 401>({
+      success: false,
+      message: "Error happened while logging out",
+      cause: "DEBUG, user not found or already logged out probably",
+    });
+  }
 });
 
 export default app;
