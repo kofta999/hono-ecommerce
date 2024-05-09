@@ -180,8 +180,6 @@ app.get("/logout", jwt({ secret: process.env.JWT_SECRET }), async (c) => {
       message: "Logged out successfully",
     });
   } catch (error) {
-    console.error(error);
-
     return c.json<Response, 401>({
       success: false,
       message: "Error happened while logging out",
