@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { zValidator } from "../../shared/zValidator";
-import { loginSchema, registerSchema } from "./schemas";
+import { loginSchema, refreshSchema, registerSchema } from "./schemas";
 import { db } from "../../shared/db";
 import { Response } from "../../shared/types/Response";
 import { randomBytes } from "crypto";
@@ -68,6 +68,7 @@ app.post("/login", zValidator("json", loginSchema), async (c) => {
   }
 
   const refreshToken = randomBytes(64).toString("hex");
+  const hashedRefreshToken = await Bun.password.hash(refreshToken);
 
   const payload: JwtPayload = {
     id: existingUser.id,
@@ -81,11 +82,9 @@ app.post("/login", zValidator("json", loginSchema), async (c) => {
 
   await db.user.update({
     where: { email },
-    data: { refreshToken },
+    data: { refreshToken: hashedRefreshToken },
     select: null,
   });
-
-  console.log(refreshToken, accessToken);
 
   return c.json<Response, 200>({
     success: true,
@@ -94,6 +93,67 @@ app.post("/login", zValidator("json", loginSchema), async (c) => {
       username: existingUser.username,
       accessToken,
       refreshToken,
+    },
+  });
+});
+
+app.post("/refresh", zValidator("json", refreshSchema), async (c) => {
+  const { refreshToken, userId } = c.req.valid("json");
+
+  const existingUser = await db.user.findFirst({
+    where: { id: userId },
+    select: { refreshToken: true, username: true },
+  });
+
+  if (!existingUser) {
+    return c.json<Response, 401>({
+      success: false,
+      message: "Invalid credentials",
+      cause: "DEBUG, user not found",
+    });
+  }
+
+  if (!existingUser.refreshToken) {
+    return c.json<Response, 401>({
+      success: false,
+      message: "User is not logged in",
+    });
+  }
+
+  const isValidToken = await Bun.password.verify(
+    refreshToken,
+    existingUser.refreshToken
+  );
+
+  if (!isValidToken) {
+    return c.json<Response, 401>({
+      success: false,
+      message: "Invalid refresh token",
+    });
+  }
+
+  const newRefreshToken = randomBytes(64).toString("hex");
+  const hashedNewRefreshToken = await Bun.password.hash(newRefreshToken);
+
+  const payload: JwtPayload = { id: userId, username: existingUser.username };
+
+  const newAccessToken = await sign(
+    { ...payload, exp: Date.now() * 60 * 60 * 24, iat: Date.now() },
+    process.env.JWT_SECRET
+  );
+
+  await db.user.update({
+    where: { id: userId },
+    data: { refreshToken: hashedNewRefreshToken },
+    select: null,
+  });
+
+  return c.json<Response, 200>({
+    success: true,
+    message: "Renewed access token",
+    data: {
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
     },
   });
 });
