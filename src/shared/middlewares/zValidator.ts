@@ -1,7 +1,7 @@
 import { ValidationTargets } from "hono";
 import { validator } from "hono/validator";
 import { ZodSchema } from "zod";
-import { Response } from "./types/Response";
+import { Response } from "../types/Response";
 
 export const zValidator = <T>(
   type: keyof ValidationTargets,

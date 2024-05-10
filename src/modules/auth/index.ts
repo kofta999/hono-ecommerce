@@ -1,11 +1,12 @@
 import { Hono } from "hono";
-import { zValidator } from "../../shared/zValidator";
+import { zValidator } from "../../shared/middlewares/zValidator";
 import { loginSchema, refreshSchema, registerSchema } from "./schemas";
 import { db } from "../../shared/db";
 import { Response } from "../../shared/types/Response";
 import { randomBytes } from "crypto";
-import { jwt, sign, verify } from "hono/jwt";
+import { sign } from "hono/jwt";
 import { JwtPayload } from "./types";
+import { authenticate } from "../../shared/middlewares/authenticate";
 
 const app = new Hono();
 
@@ -20,10 +21,13 @@ app.post("/register", zValidator("json", registerSchema), async (c) => {
     })) > 0;
 
   if (isUserExists) {
-    return c.json<Response, 409>({
-      success: false,
-      message: "User already exists, please log in instead",
-    });
+    return c.json<Response, 409>(
+      {
+        success: false,
+        message: "User already exists, please log in instead",
+      },
+      409
+    );
   }
 
   const hashedPassword = await Bun.password.hash(parsedUser.password);
@@ -48,11 +52,14 @@ app.post("/login", zValidator("json", loginSchema), async (c) => {
   });
 
   if (!existingUser) {
-    return c.json<Response, 401>({
-      success: false,
-      message: "Invalid credentials",
-      cause: "DEBUG, user not found",
-    });
+    return c.json<Response, 401>(
+      {
+        success: false,
+        message: "Invalid credentials",
+        cause: "DEBUG, user not found",
+      },
+      401
+    );
   }
 
   const isValidPassword = await Bun.password.verify(
@@ -61,10 +68,13 @@ app.post("/login", zValidator("json", loginSchema), async (c) => {
   );
 
   if (!isValidPassword) {
-    return c.json<Response, 401>({
-      success: false,
-      message: "Invalid password",
-    });
+    return c.json<Response, 401>(
+      {
+        success: false,
+        message: "Invalid password",
+      },
+      401
+    );
   }
 
   const refreshToken = randomBytes(64).toString("hex");
@@ -110,18 +120,24 @@ app.post("/refresh", zValidator("json", refreshSchema), async (c) => {
   });
 
   if (!existingUser) {
-    return c.json<Response, 401>({
-      success: false,
-      message: "Invalid credentials",
-      cause: "DEBUG, user not found",
-    });
+    return c.json<Response, 401>(
+      {
+        success: false,
+        message: "Invalid credentials",
+        cause: "DEBUG, user not found",
+      },
+      401
+    );
   }
 
   if (!existingUser.refreshToken) {
-    return c.json<Response, 401>({
-      success: false,
-      message: "User is not logged in",
-    });
+    return c.json<Response, 401>(
+      {
+        success: false,
+        message: "User is not logged in",
+      },
+      401
+    );
   }
 
   const isValidToken = await Bun.password.verify(
@@ -130,10 +146,13 @@ app.post("/refresh", zValidator("json", refreshSchema), async (c) => {
   );
 
   if (!isValidToken) {
-    return c.json<Response, 401>({
-      success: false,
-      message: "Invalid refresh token",
-    });
+    return c.json<Response, 401>(
+      {
+        success: false,
+        message: "Invalid refresh token",
+      },
+      401
+    );
   }
 
   const newRefreshToken = randomBytes(64).toString("hex");
@@ -166,12 +185,12 @@ app.post("/refresh", zValidator("json", refreshSchema), async (c) => {
   });
 });
 
-app.get("/logout", jwt({ secret: process.env.JWT_SECRET }), async (c) => {
-  const payload: JwtPayload = c.get("jwtPayload");
+app.get("/logout", authenticate, async (c) => {
+  const { id } = c.get("user");
 
   try {
     await db.user.update({
-      where: { id: payload.id, NOT: [{ refreshToken: null }] },
+      where: { id: id, NOT: [{ refreshToken: null }] },
       data: { refreshToken: null },
     });
 
@@ -180,11 +199,14 @@ app.get("/logout", jwt({ secret: process.env.JWT_SECRET }), async (c) => {
       message: "Logged out successfully",
     });
   } catch (error) {
-    return c.json<Response, 401>({
-      success: false,
-      message: "Error happened while logging out",
-      cause: "DEBUG, user not found or already logged out probably",
-    });
+    return c.json<Response, 401>(
+      {
+        success: false,
+        message: "Error happened while logging out",
+        cause: "DEBUG, user not found or already logged out probably",
+      },
+      401
+    );
   }
 });
 
