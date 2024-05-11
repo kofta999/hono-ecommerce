@@ -3,16 +3,17 @@ import { Env } from "../types/Env";
 import { Response } from "../types/Response";
 import { verify } from "hono/jwt";
 import { JwtPayload } from "../../modules/auth/types";
+import { r } from "../utils";
 
 export const authenticate = createMiddleware<Env>(async (c, next) => {
   const authHeader = c.req.header()["authorization"];
 
   if (!authHeader) {
-    return c.json<Response, 401>(
-      {
+    return c.json(
+      r({
         success: false,
         message: "Auth header is not provided",
-      },
+      }),
       401
     );
   }
@@ -20,11 +21,11 @@ export const authenticate = createMiddleware<Env>(async (c, next) => {
   const token = authHeader.split(" ")[1];
 
   if (!token) {
-    return c.json<Response, 401>(
-      {
+    return c.json(
+      r({
         success: false,
         message: "JWT token is not provided",
-      },
+      }),
       401
     );
   }
@@ -41,11 +42,11 @@ export const authenticate = createMiddleware<Env>(async (c, next) => {
   } catch (error) {
     console.error(error);
 
-    return c.json<Response, 401>(
-      {
+    return c.json(
+      r({
         success: false,
         message: "Invalid JWT token",
-      },
+      }),
       401
     );
   }
