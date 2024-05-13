@@ -1,0 +1,160 @@
+[
+  {
+    "schemaName": "public",
+    "tableName": "Product",
+    "predictions": [
+      {
+        "input": "public product description",
+        "column": "description",
+        "shape": "COMMERCE_PRODUCT_DESCRIPTION",
+        "confidence": 0.8473999500274658,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      },
+      {
+        "input": "public product title",
+        "column": "title",
+        "shape": "COMMERCE_PRODUCT_NAME",
+        "confidence": 0.9157878756523132,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      }
+    ]
+  },
+  {
+    "schemaName": "public",
+    "tableName": "ProductCategory",
+    "predictions": [
+      {
+        "input": "public product_category description",
+        "column": "description",
+        "shape": "COMMERCE_PRODUCT_DESCRIPTION",
+        "confidence": 0.854702889919281,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      },
+      {
+        "input": "public product_category name",
+        "column": "name",
+        "shape": "COMMERCE_PRODUCT",
+        "confidence": 0.7303023338317871,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      }
+    ]
+  },
+  {
+    "schemaName": "public",
+    "tableName": "User",
+    "predictions": [
+      {
+        "input": "public user email",
+        "column": "email",
+        "shape": "EMAIL",
+        "confidence": 0.99404376745224,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      },
+      {
+        "input": "public user password",
+        "column": "password",
+        "shape": "PASSWORD",
+        "confidence": 0.9340711236000061,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      },
+      {
+        "input": "public user refresh_token",
+        "column": "refreshToken",
+        "shape": "TOKEN",
+        "confidence": 0.9432976245880127,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      },
+      {
+        "input": "public user username",
+        "column": "username",
+        "shape": "USERNAME",
+        "confidence": 0.9716823697090149,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      }
+    ]
+  },
+  {
+    "schemaName": "public",
+    "tableName": "UserAddress",
+    "predictions": [
+      {
+        "input": "public user_address address_line_1",
+        "column": "addressLine1",
+        "shape": "STREET_ADDRESS",
+        "confidence": 0.9961910247802734,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      },
+      {
+        "input": "public user_address address_line_2",
+        "column": "addressLine2",
+        "shape": "STREET_ADDRESS",
+        "confidence": 0.9821840524673462,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      },
+      {
+        "input": "public user_address city",
+        "column": "city",
+        "shape": "CITY",
+        "confidence": 0.9954383969306946,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      },
+      {
+        "input": "public user_address country",
+        "column": "country",
+        "shape": "COUNTRY",
+        "confidence": 0.9953468441963196,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      },
+      {
+        "input": "public user_address phone_number",
+        "column": "phoneNumber",
+        "shape": "PHONE_NUMBER",
+        "confidence": 0.9883983731269836,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      },
+      {
+        "input": "public user_address postal_code",
+        "column": "postalCode",
+        "shape": "TAX_CODE",
+        "confidence": 0.8841333985328674,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      }
+    ]
+  },
+  {
+    "schemaName": "public",
+    "tableName": "UserPayment",
+    "predictions": [
+      {
+        "input": "public user_payment payment_type",
+        "column": "paymentType",
+        "shape": "FINANCE_PAYMENT_METHOD",
+        "confidence": 0.8056674599647522,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      },
+      {
+        "input": "public user_payment provider",
+        "column": "provider",
+        "shape": "FINANCE_PAYMENT_METHOD",
+        "confidence": 0.3599900305271149,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      }
+    ]
+  }
+]

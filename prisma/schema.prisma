@@ -15,17 +15,18 @@ datasource db {
 }
 
 model User {
-  id            Int           @id @default(autoincrement())
-  email         String        @unique
+  id            Int      @id @default(autoincrement())
+  email         String   @unique
   password      String
-  username      String        @unique
-  bio           String        @default("Avaliable")
-  profilePicUrl String        @default("https://static.vecteezy.com/system/resources/previews/003/337/584/large_2x/default-avatar-photo-placeholder-profile-icon-vector.jpg")
+  username      String   @unique
+  bio           String   @default("Avaliable")
+  profilePicUrl String   @default("https://static.vecteezy.com/system/resources/previews/003/337/584/large_2x/default-avatar-photo-placeholder-profile-icon-vector.jpg")
   refreshToken  String?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  UserAddress   UserAddress[]
-  UserPayment   UserPayment[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  userAddress UserAddress[]
+  userPayment UserPayment[]
 }
 
 model UserAddress {
@@ -38,7 +39,7 @@ model UserAddress {
   country      String
   phoneNumber  String
 
-  User User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 }
 
 model UserPayment {
@@ -46,7 +47,7 @@ model UserPayment {
   userId      Int
   paymentType String
   provider    String
-  User        User   @relation(fields: [userId], references: [id])
+  user        User   @relation(fields: [userId], references: [id])
 }
 
 model Product {
@@ -55,32 +56,34 @@ model Product {
   description String
   // SKU         String
   categoryId  Int
-  inventoryId Int
+  inventoryId Int      @unique
   price       Decimal
   discountId  Int
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt()
 
-  Category  ProductCategory  @relation(fields: [categoryId], references: [id])
-  Inventory ProductInventory @relation(fields: [inventoryId], references: [id])
-  Discount  Discount         @relation(fields: [discountId], references: [id])
+  category  ProductCategory  @relation(fields: [categoryId], references: [id])
+  discount  Discount         @relation(fields: [discountId], references: [id])
+  inventory ProductInventory @relation(fields: [inventoryId], references: [id])
 }
 
 model ProductCategory {
-  id          Int       @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   name        String
-  descreption String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt()
-  Product     Product[]
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt()
+
+  product Product[]
 }
 
 model ProductInventory {
-  id        Int       @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   quantity  Int
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt()
-  Product   Product[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+
+  product Product?
 }
 
 model Discount {
@@ -89,7 +92,7 @@ model Discount {
   active          Boolean
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt()
-  Product         Product[]
+  product         Product[]
 }
 
 //   id        Int     @id @default(autoincrement())

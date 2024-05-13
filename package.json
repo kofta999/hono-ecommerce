@@ -7,8 +7,16 @@
     "hono": "^4.3.4",
     "zod": "^3.23.6"
   },
+  "prisma": {
+    "seed": "tsx prisma/seed/seed.ts",
+    "migrate": "prisma migrate dev",
+    "postmigrate": "npx @snaplet/seed --config prisma/seed/seed.config.ts sync"
+  },
   "devDependencies": {
+    "@snaplet/copycat": "^5.0.0",
+    "@snaplet/seed": "0.97.13",
     "@types/bun": "latest",
-    "prisma": "5.13.0"
+    "prisma": "5.13.0",
+    "tsx": "^4.10.2"
   }
 }

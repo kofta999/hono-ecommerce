@@ -17,9 +17,9 @@ app.get("/", async (c) => {
     take: perPage,
     skip: perPage * (page - 1),
     include: {
-      Category: { select: { name: true } },
-      Inventory: { select: { quantity: true } },
-      Discount: { select: { discountPercent: true, active: true } },
+      category: { select: { name: true } },
+      inventory: { select: { quantity: true } },
+      discount: { select: { discountPercent: true, active: true } },
     },
   });
 
@@ -27,9 +27,9 @@ app.get("/", async (c) => {
     ({
       title,
       price,
-      Category: { name },
-      Discount: { active, discountPercent },
-      Inventory: { quantity },
+      category: { name },
+      discount: { active, discountPercent },
+      inventory: { quantity },
     }): ProductResponse => {
       const productRes: ProductResponse = {
         title,
