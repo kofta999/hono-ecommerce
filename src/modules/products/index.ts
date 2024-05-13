@@ -52,7 +52,7 @@ app.get("/", async (c) => {
     }
   );
 
-  c.json(
+  return c.json(
     r({
       success: true,
       message: "Fetched products",
