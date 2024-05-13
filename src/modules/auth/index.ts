@@ -2,7 +2,6 @@ import { Hono } from "hono";
 import { zValidator } from "../../shared/middlewares/zValidator";
 import { loginSchema, refreshSchema, registerSchema } from "./schemas";
 import { db } from "../../shared/db";
-import { Response } from "../../shared/types/Response";
 import { randomBytes } from "crypto";
 import { sign } from "hono/jwt";
 import { JwtPayload } from "./types";

@@ -1,15 +1,18 @@
-type SuccessResponse = {
+import { Pagination } from "./Pagination";
+
+type SuccessResponse<T> = {
   success: true;
   message: string;
-  data?: unknown;
+  data?: T;
+  pagination?: Pagination;
   cause?: never;
 };
 
-type FailureResponse = {
+type FailureResponse<T> = {
   success: false;
   message: string;
   data?: never;
-  cause?: unknown;
+  cause?: T;
 };
 
-export type Response = SuccessResponse | FailureResponse;
+export type Response<T> = SuccessResponse<T> | FailureResponse<T>;
