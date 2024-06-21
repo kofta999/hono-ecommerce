@@ -9,10 +9,12 @@ import { loginSchema, refreshSchema, registerSchema } from "./schemas";
 import { r } from "../../shared/utils";
 import {
   createUserWithEmailAndPassword,
+  firebaseAdmin,
   getAuth,
   sendEmailVerification,
   signInWithEmailAndPassword,
 } from "../../firebase";
+import { authorize } from "../../shared/middlewares/authorize";
 
 const app = new Hono();
 const auth = getAuth();
@@ -59,14 +61,16 @@ app.post("/login", zValidator("json", loginSchema), async (c) => {
       password
     );
 
-    const idToken = await userCredential.user.getIdToken();
+    const accessToken = await userCredential.user.getIdToken();
+    const refreshToken = userCredential.user.refreshToken;
 
     return c.json(
       r({
         success: true,
         message: "User logged in successfully",
         data: {
-          accessToken: idToken,
+          accessToken,
+          refreshToken,
         },
       })
     );
@@ -82,91 +86,44 @@ app.post("/login", zValidator("json", loginSchema), async (c) => {
   }
 });
 
-// app.post("/refresh", zValidator("json", refreshSchema), async (c) => {
-//   const { refreshToken, userId } = c.req.valid("json");
+app.post("/refresh", zValidator("json", refreshSchema), async (c) => {
+  const { refreshToken } = c.req.valid("json");
 
-//   const existingUser = await db.user.findFirst({
-//     where: { id: userId },
-//     select: { refreshToken: true, username: true },
-//   });
+  const URL = "https://securetoken.googleapis.com/v1/token";
 
-//   if (!existingUser) {
-//     return c.json(
-//       r({
-//         success: false,
-//         message: "Invalid credentials",
-//         cause: "DEBUG, user not found",
-//       }),
-//       401
-//     );
-//   }
+  console.log(process.env.FIREBASE_API_KEY);
+  const res = await fetch(`${URL}?key=${process.env.FIREBASE_API_KEY}`, {
+    method: "post",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: `grant_type=refresh_token&refresh_token=${refreshToken}`,
+  });
 
-//   if (!existingUser.refreshToken) {
-//     return c.json(
-//       r({
-//         success: false,
-//         message: "User is not logged in",
-//       }),
-//       401
-//     );
-//   }
+  if (!res.ok) {
+    console.log("error");
+  }
 
-//   const isValidToken = await Bun.password.verify(
-//     refreshToken,
-//     existingUser.refreshToken
-//   );
+  const data = await res.json();
 
-//   if (!isValidToken) {
-//     return c.json(
-//       r({
-//         success: false,
-//         message: "Invalid refresh token",
-//       }),
-//       401
-//     );
-//   }
+  console.log(data);
 
-//   const newRefreshToken = randomBytes(64).toString("hex");
-//   const hashedNewRefreshToken = await Bun.password.hash(newRefreshToken);
-
-//   const payload: JwtPayload = { id: userId, username: existingUser.username };
-
-//   const newAccessToken = await sign(
-//     {
-//       ...payload,
-//       exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24,
-//       iat: Math.floor(Date.now() / 1000),
-//     },
-//     process.env.JWT_SECRET
-//   );
-
-//   await db.user.update({
-//     where: { id: userId },
-//     data: { refreshToken: hashedNewRefreshToken },
-//     select: null,
-//   });
-
-//   return c.json(
-//     r({
-//       success: true,
-//       message: "Renewed access token",
-//       data: {
-//         accessToken: newAccessToken,
-//         refreshToken: newRefreshToken,
-//       },
-//     })
-//   );
-// });
+  return c.json(
+    r({
+      success: true,
+      message: "Renewed access token",
+      data: {
+        accessToken: data.access_token,
+        refreshToken: data.refresh_token,
+      },
+    })
+  );
+});
 
 // app.get("/logout", authorize, async (c) => {
 //   const { id } = c.get("user");
 
 //   try {
-//     await db.user.update({
-//       where: { id: id, NOT: [{ refreshToken: null }] },
-//       data: { refreshToken: null },
-//     });
-
 //     return c.json(
 //       r({
 //         success: true,

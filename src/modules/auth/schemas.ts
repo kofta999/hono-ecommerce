@@ -22,6 +22,6 @@ export const registerSchema = z.object({
 export const loginSchema = registerSchema.pick({ email: true, password: true });
 
 export const refreshSchema = z.object({
-  userId: z.number(),
+  // userId: z.number(),
   refreshToken: z.string(),
 });
