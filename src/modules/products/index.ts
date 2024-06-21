@@ -3,12 +3,13 @@ import { db } from "../../shared/db";
 import { calculatePagination, r } from "../../shared/utils";
 import { ProductResponse } from "./types";
 import { calculateDiscountedPrice } from "./util";
+import { authorize } from "../../shared/middlewares/authorize";
 
 const LOW_PRODUCT_QUANTITY = 10;
 
 const app = new Hono();
 
-app.get("/", async (c) => {
+app.get("/", authorize, async (c) => {
   const page = parseInt(c.req.query("page") || "1");
   const perPage = parseInt(c.req.query("perPage") || "10");
 

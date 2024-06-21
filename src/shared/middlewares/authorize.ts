@@ -1,11 +1,9 @@
 import { createMiddleware } from "hono/factory";
 import { Env } from "../types/Env";
-import { Response } from "../types/Response";
-import { verify } from "hono/jwt";
-import { JwtPayload } from "../../modules/auth/types";
 import { r } from "../utils";
+import { firebaseAdmin } from "../../firebase";
 
-export const authenticate = createMiddleware<Env>(async (c, next) => {
+export const authorize = createMiddleware<Env>(async (c, next) => {
   const authHeader = c.req.header()["authorization"];
 
   if (!authHeader) {
@@ -31,13 +29,8 @@ export const authenticate = createMiddleware<Env>(async (c, next) => {
   }
 
   try {
-    const { id, username }: JwtPayload = await verify(
-      token,
-      process.env.JWT_SECRET
-    );
-
-    c.set("user", { id, username });
-
+    const decodedToken = await firebaseAdmin.auth().verifyIdToken(token);
+    c.set("user", decodedToken);
     return next();
   } catch (error) {
     console.error(error);
