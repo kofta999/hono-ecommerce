@@ -7,35 +7,38 @@ import { sign } from "hono/jwt";
 import { JwtPayload } from "./types";
 import { authenticate } from "../../shared/middlewares/authenticate";
 import { r } from "../../shared/utils";
+import {} from "../../firebase";
 
 const app = new Hono();
 
 app.post("/register", zValidator("json", registerSchema), async (c) => {
   const parsedUser = c.req.valid("json");
 
-  const isUserExists =
-    (await db.user.count({
-      where: {
-        OR: [{ email: parsedUser.email }, { username: parsedUser.username }],
-      },
-    })) > 0;
+  firebase;
 
-  if (isUserExists) {
-    return c.json(
-      r({
-        success: false,
-        message: "User already exists, please log in instead",
-      }),
-      409
-    );
-  }
+  // const isUserExists =
+  //   (await db.user.count({
+  //     where: {
+  //       OR: [{ email: parsedUser.email }, { username: parsedUser.username }],
+  //     },
+  //   })) > 0;
 
-  const hashedPassword = await Bun.password.hash(parsedUser.password);
+  // if (isUserExists) {
+  //   return c.json(
+  //     r({
+  //       success: false,
+  //       message: "User already exists, please log in instead",
+  //     }),
+  //     409
+  //   );
+  // }
 
-  const { id } = await db.user.create({
-    data: { ...parsedUser, password: hashedPassword },
-    select: { id: true },
-  });
+  // const hashedPassword = await Bun.password.hash(parsedUser.password);
+
+  // const { id } = await db.user.create({
+  //   data: { ...parsedUser, password: hashedPassword },
+  //   select: { id: true },
+  // });
 
   return c.json(
     r({

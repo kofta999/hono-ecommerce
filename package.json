@@ -4,6 +4,7 @@
   },
   "dependencies": {
     "@prisma/client": "5.13.0",
+    "firebase-admin": "^12.2.0",
     "hono": "^4.3.4",
     "zod": "^3.23.6"
   },
