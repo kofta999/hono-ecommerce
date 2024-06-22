@@ -1,5 +1,6 @@
 export type ProductResponse = {
-  title: string;
+  name: string;
+  imageUrl: string;
   price: number;
   discountedPrice?: number;
   quantity?: number;

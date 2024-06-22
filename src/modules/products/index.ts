@@ -9,7 +9,7 @@ const LOW_PRODUCT_QUANTITY = 10;
 
 const app = new Hono();
 
-app.get("/", authorize, async (c) => {
+app.get("/", async (c) => {
   const page = parseInt(c.req.query("page") || "1");
   const perPage = parseInt(c.req.query("perPage") || "10");
 
@@ -19,23 +19,24 @@ app.get("/", authorize, async (c) => {
     skip: perPage * (page - 1),
     include: {
       category: { select: { name: true } },
-      inventory: { select: { quantity: true } },
       discount: { select: { discountPercent: true, active: true } },
     },
   });
 
   const mappedProds = products.map(
     ({
-      title,
+      name,
       price,
-      category: { name },
+      category,
+      imageUrl,
       discount: { active, discountPercent },
-      inventory: { quantity },
+      quantity,
     }): ProductResponse => {
       const productRes: ProductResponse = {
-        title,
+        name,
         price: price.toNumber(),
-        category: name,
+        imageUrl,
+        category: category.name,
       };
 
       if (active) {
@@ -61,6 +62,26 @@ app.get("/", authorize, async (c) => {
         products: mappedProds,
       },
       pagination: calculatePagination(page, productsCount, perPage),
+    })
+  );
+});
+
+app.get("/:id", async (c) => {
+  const productId = parseInt(c.req.param("id"));
+
+  const product = await db.product.findUnique({ where: { id: productId } });
+
+  if (!product) {
+    return c.json(r({ success: false, message: "Product not found" }), 404);
+  }
+
+  return c.json(
+    r({
+      success: true,
+      message: "Fetched product successfully",
+      data: {
+        product,
+      },
     })
   );
 });
