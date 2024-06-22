@@ -15,18 +15,16 @@ datasource db {
 }
 
 model User {
-  id            Int      @id @default(autoincrement())
-  email         String   @unique
-  password      String
-  username      String   @unique
-  bio           String   @default("Avaliable")
-  profilePicUrl String   @default("https://static.vecteezy.com/system/resources/previews/003/337/584/large_2x/default-avatar-photo-placeholder-profile-icon-vector.jpg")
-  refreshToken  String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id          Int      @id @default(autoincrement())
+  firebaseId  String
+  name        String
+  phoneNumber String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   userAddress UserAddress[]
-  userPayment UserPayment[]
+  // userPayment UserPayment[]
+  Review      Review[]
 }
 
 model UserAddress {
@@ -42,49 +40,55 @@ model UserAddress {
   user User @relation(fields: [userId], references: [id])
 }
 
-model UserPayment {
-  id          Int    @id @default(autoincrement())
-  userId      Int
-  paymentType String
-  provider    String
-  user        User   @relation(fields: [userId], references: [id])
-}
+// model UserPayment {
+//   id          Int    @id @default(autoincrement())
+//   userId      Int
+//   paymentType String
+//   provider    String
+//   user        User   @relation(fields: [userId], references: [id])
+// }
 
 model Product {
   id          Int      @id @default(autoincrement())
-  title       String
+  name        String
   description String
-  // SKU         String
-  categoryId  Int
-  inventoryId Int      @unique
   price       Decimal
+  imageUrl    String
   discountId  Int
+  categoryId  Int
+  quantity    Int
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt()
+  sizes       Size[]
+  colors      String[]
+  // Rate
 
-  category  ProductCategory  @relation(fields: [categoryId], references: [id])
-  discount  Discount         @relation(fields: [discountId], references: [id])
-  inventory ProductInventory @relation(fields: [inventoryId], references: [id])
+  reviews Review[]
+
+  category ProductCategory @relation(fields: [categoryId], references: [id])
+  discount Discount        @relation(fields: [discountId], references: [id])
+  // inventoryId Int      @unique
+  // inventory ProductInventory @relation(fields: [inventoryId], references: [id])
 }
 
 model ProductCategory {
-  id          Int      @id @default(autoincrement())
-  name        String
-  description String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt()
+  id        Int      @id @default(autoincrement())
+  name      String
+  imageUrl  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
 
   product Product[]
 }
 
-model ProductInventory {
-  id        Int      @id @default(autoincrement())
-  quantity  Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt()
+// model ProductInventory {
+//   id        Int      @id @default(autoincrement())
+//   quantity  Int
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt()
 
-  product Product?
-}
+//   product Product?
+// }
 
 model Discount {
   id              Int       @id @default(autoincrement())
@@ -95,10 +99,20 @@ model Discount {
   product         Product[]
 }
 
-//   id        Int     @id @default(autoincrement())
-// model Review {
-//   userId    Int
-//   productId Int
-//   content   String
-//   Product   Product @relation(fields: [productId], references: [id])
-// }
+model Review {
+  id        Int     @id @default(autoincrement())
+  userId    Int
+  productId Int
+  content   String
+  Product   Product @relation(fields: [productId], references: [id])
+  User      User    @relation(fields: [userId], references: [id])
+}
+
+enum Size {
+  SMALL
+  MEDIUM
+  L
+  XL
+  XXL
+  XXXL
+}
