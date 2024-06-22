@@ -3,7 +3,7 @@
     "dev": "bun run --hot src/index.ts"
   },
   "dependencies": {
-    "@prisma/client": "5.13.0",
+    "@prisma/client": "^5.15.1",
     "firebase": "^10.12.2",
     "firebase-admin": "^12.2.0",
     "hono": "^4.3.4",
@@ -18,7 +18,7 @@
     "@snaplet/copycat": "^5.0.0",
     "@snaplet/seed": "0.97.13",
     "@types/bun": "latest",
-    "prisma": "5.13.0",
+    "prisma": "^5.15.1",
     "tsx": "^4.10.2"
   }
 }

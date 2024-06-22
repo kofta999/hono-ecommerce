@@ -1,26 +1,20 @@
 import { Hono } from "hono";
 import { zValidator } from "../../shared/middlewares/zValidator";
 import { loginSchema, refreshSchema, registerSchema } from "./schemas";
-// import { db } from "../../shared/db";
-// import { randomBytes } from "crypto";
-// import { sign } from "hono/jwt";
-// import { JwtPayload } from "./types";
-// import { authorize } from "../../shared/middlewares/authorize";
 import { r } from "../../shared/utils";
 import {
   createUserWithEmailAndPassword,
-  firebaseAdmin,
   getAuth,
   sendEmailVerification,
   signInWithEmailAndPassword,
 } from "../../firebase";
-import { authorize } from "../../shared/middlewares/authorize";
+import { db } from "../../shared/db";
 
 const app = new Hono();
 const auth = getAuth();
 
 app.post("/register", zValidator("json", registerSchema), async (c) => {
-  const { email, password } = c.req.valid("json");
+  const { email, password, name } = c.req.valid("json");
 
   try {
     const currentUser = await createUserWithEmailAndPassword(
@@ -29,21 +23,26 @@ app.post("/register", zValidator("json", registerSchema), async (c) => {
       password
     );
 
+    const dbUser = await db.user.create({
+      data: { name, firebaseId: currentUser.user.uid },
+    });
+
     sendEmailVerification(currentUser.user).catch((e) => console.log(e));
 
     return c.json(
       r({
         success: true,
         message: "User created successfully, verification email sent",
-        data: currentUser.user.uid,
+        data: dbUser.id,
       })
     );
   } catch (error) {
-    console.log(error);
+    console.error(error);
+    const e = error as Error;
 
     return c.json(
       r({
-        message: error.message as string,
+        message: e.message,
         success: false,
       }),
       500
@@ -75,7 +74,7 @@ app.post("/login", zValidator("json", loginSchema), async (c) => {
       })
     );
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return c.json(
       r({
         success: false,
@@ -91,7 +90,6 @@ app.post("/refresh", zValidator("json", refreshSchema), async (c) => {
 
   const URL = "https://securetoken.googleapis.com/v1/token";
 
-  console.log(process.env.FIREBASE_API_KEY);
   const res = await fetch(`${URL}?key=${process.env.FIREBASE_API_KEY}`, {
     method: "post",
     headers: {
@@ -101,7 +99,13 @@ app.post("/refresh", zValidator("json", refreshSchema), async (c) => {
   });
 
   if (!res.ok) {
-    console.log("error");
+    return c.json(
+      r({
+        success: false,
+        message: "Error happened while refreshing the token",
+      }),
+      500
+    );
   }
 
   const data = await res.json();
