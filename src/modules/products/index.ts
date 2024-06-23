@@ -2,24 +2,44 @@ import { Hono } from "hono";
 import { db } from "../../shared/db";
 import { calculatePagination, r } from "../../shared/utils";
 import { ProductResponse } from "./types";
-import { calculateDiscountedPrice } from "./util";
+import { calculateDiscountedPrice, toInt } from "./util";
 import { authorize } from "../../shared/middlewares/authorize";
+import { zValidator } from "../../shared/middlewares/zValidator";
+import { productsQuerySchema } from "./schemas";
 
 const LOW_PRODUCT_QUANTITY = 10;
 
 const app = new Hono();
 
-app.get("/", async (c) => {
-  const page = parseInt(c.req.query("page") || "1");
-  const perPage = parseInt(c.req.query("perPage") || "10");
+app.get("/", zValidator("query", productsQuerySchema), async (c) => {
+  const query = c.req.valid("query");
+
+  const q = query.q;
+  const page = toInt(query.page, 1);
+  const perPage = toInt(query.perPage, 10);
+  const categoryId = toInt(query.categoryId);
+  const minPrice = toInt(query.minPrice);
+  const maxPrice = toInt(query.maxPrice);
 
   const productsCount = await db.product.count();
+
   const products = await db.product.findMany({
     take: perPage,
     skip: perPage * (page - 1),
     include: {
       category: { select: { name: true } },
       discount: { select: { discountPercent: true, active: true } },
+    },
+    where: {
+      categoryId: categoryId,
+      name: {
+        contains: q,
+        mode: "insensitive"
+      },
+      price: {
+        gte: minPrice,
+        lte: maxPrice,
+      },
     },
   });
 

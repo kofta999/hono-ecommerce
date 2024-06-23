@@ -4,6 +4,14 @@
     "tableName": "Product",
     "predictions": [
       {
+        "input": "public product colors",
+        "column": "colors",
+        "shape": "COMMERCE_PRODUCT",
+        "confidence": 0.5718616843223572,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      },
+      {
         "input": "public product description",
         "column": "description",
         "shape": "COMMERCE_PRODUCT_DESCRIPTION",
@@ -12,10 +20,18 @@
         "confidenceContext": 0
       },
       {
-        "input": "public product title",
-        "column": "title",
+        "input": "public product image_url",
+        "column": "imageUrl",
+        "shape": "IMAGE_URL",
+        "confidence": 0.9674884080886841,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      },
+      {
+        "input": "public product name",
+        "column": "name",
         "shape": "COMMERCE_PRODUCT_NAME",
-        "confidence": 0.9157878756523132,
+        "confidence": 0.9166077375411987,
         "context": "GENERAL",
         "confidenceContext": 0
       }
@@ -26,10 +42,10 @@
     "tableName": "ProductCategory",
     "predictions": [
       {
-        "input": "public product_category description",
-        "column": "description",
-        "shape": "COMMERCE_PRODUCT_DESCRIPTION",
-        "confidence": 0.854702889919281,
+        "input": "public product_category image_url",
+        "column": "imageUrl",
+        "shape": "IMAGE_URL",
+        "confidence": 0.9742067456245422,
         "context": "GENERAL",
         "confidenceContext": 0
       },
@@ -45,37 +61,35 @@
   },
   {
     "schemaName": "public",
+    "tableName": "Review",
+    "predictions": [
+      {
+        "input": "public review content",
+        "column": "content",
+        "shape": "REVIEW",
+        "confidence": 1,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      }
+    ]
+  },
+  {
+    "schemaName": "public",
     "tableName": "User",
     "predictions": [
       {
-        "input": "public user email",
-        "column": "email",
-        "shape": "EMAIL",
-        "confidence": 0.99404376745224,
+        "input": "public user firebase_id",
+        "column": "firebaseId",
+        "shape": "UUID",
+        "confidence": 0.9968422651290894,
         "context": "GENERAL",
         "confidenceContext": 0
       },
       {
-        "input": "public user password",
-        "column": "password",
-        "shape": "PASSWORD",
-        "confidence": 0.9340711236000061,
-        "context": "GENERAL",
-        "confidenceContext": 0
-      },
-      {
-        "input": "public user refresh_token",
-        "column": "refreshToken",
-        "shape": "TOKEN",
-        "confidence": 0.9432976245880127,
-        "context": "GENERAL",
-        "confidenceContext": 0
-      },
-      {
-        "input": "public user username",
-        "column": "username",
+        "input": "public user name",
+        "column": "name",
         "shape": "USERNAME",
-        "confidence": 0.9716823697090149,
+        "confidence": 0.9706624150276184,
         "context": "GENERAL",
         "confidenceContext": 0
       }
@@ -130,28 +144,6 @@
         "column": "postalCode",
         "shape": "TAX_CODE",
         "confidence": 0.8841333985328674,
-        "context": "GENERAL",
-        "confidenceContext": 0
-      }
-    ]
-  },
-  {
-    "schemaName": "public",
-    "tableName": "UserPayment",
-    "predictions": [
-      {
-        "input": "public user_payment payment_type",
-        "column": "paymentType",
-        "shape": "FINANCE_PAYMENT_METHOD",
-        "confidence": 0.8056674599647522,
-        "context": "GENERAL",
-        "confidenceContext": 0
-      },
-      {
-        "input": "public user_payment provider",
-        "column": "provider",
-        "shape": "FINANCE_PAYMENT_METHOD",
-        "confidence": 0.3599900305271149,
         "context": "GENERAL",
         "confidenceContext": 0
       }

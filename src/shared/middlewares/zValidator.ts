@@ -1,7 +1,7 @@
 import { ValidationTargets } from "hono";
 import { validator } from "hono/validator";
 import { ZodSchema } from "zod";
-import { Response } from "../types/Response";
+import { r } from "../utils";
 
 export const zValidator = <T>(
   type: keyof ValidationTargets,
@@ -12,11 +12,14 @@ export const zValidator = <T>(
 
     if (!parsed.success) {
       const errors = parsed.error.flatten().fieldErrors;
-      return c.json<Response, 400>({
-        success: false,
-        message: "Input validation error",
-        cause: errors,
-      });
+      return c.json(
+        r({
+          success: false,
+          message: "Input validation error",
+          cause: errors,
+        }),
+        400
+      );
     }
 
     return parsed.data;

@@ -16,9 +16,12 @@
   },
   "devDependencies": {
     "@snaplet/copycat": "^5.0.0",
-    "@snaplet/seed": "0.97.13",
+    "@snaplet/seed": "^0.97.20",
     "@types/bun": "latest",
     "prisma": "^5.15.1",
     "tsx": "^4.10.2"
+  },
+  "@snaplet/seed": {
+    "config": "prisma/seed/seed.config.ts"
   }
 }

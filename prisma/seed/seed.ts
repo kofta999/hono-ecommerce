@@ -12,9 +12,12 @@ const main = async () => {
   // Truncate all tables in the database
   await seed.$resetDatabase();
 
-  const { productCategory } = await seed.productCategory((x) => x(5));
-
-  await seed.product((x) => x(30), { connect: { productCategory } });
+  // Seed the database with 10 user
+  await seed.user((x) => x(10));
+  await seed.product((x) => x(10));
+  // await seed.productCategory((x) => x(10));
+  // await seed.discount((x) => x(10));
+  // await seed.review((x) => x(10));
 
   // Type completion not working? You might want to reload your TypeScript Server to pick up the changes
 
