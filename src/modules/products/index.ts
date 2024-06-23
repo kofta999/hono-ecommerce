@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { db } from "../../shared/db";
 import { calculatePagination, r } from "../../shared/utils";
 import { ProductResponse } from "./types";
-import { calculateDiscountedPrice, toInt } from "./util";
+import { calculateDiscountedPrice, parseSort, toInt } from "./util";
 import { authorize } from "../../shared/middlewares/authorize";
 import { zValidator } from "../../shared/middlewares/zValidator";
 import { productsQuerySchema } from "./schemas";
@@ -15,12 +15,14 @@ app.get("/", zValidator("query", productsQuerySchema), async (c) => {
   const query = c.req.valid("query");
 
   const q = query.q;
+  const sort = query.sort;
   const page = toInt(query.page, 1);
   const perPage = toInt(query.perPage, 10);
   const categoryId = toInt(query.categoryId);
   const minPrice = toInt(query.minPrice);
   const maxPrice = toInt(query.maxPrice);
 
+  const orderBy = parseSort(sort);
   const productsCount = await db.product.count();
 
   const products = await db.product.findMany({
@@ -41,6 +43,7 @@ app.get("/", zValidator("query", productsQuerySchema), async (c) => {
         lte: maxPrice,
       },
     },
+    orderBy,
   });
 
   const mappedProds = products.map(
