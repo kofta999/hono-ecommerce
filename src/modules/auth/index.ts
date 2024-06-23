@@ -1,4 +1,3 @@
-import { Hono } from "hono";
 import { zValidator } from "../../shared/middlewares/zValidator";
 import { loginSchema, refreshSchema, registerSchema } from "./schemas";
 import { r } from "../../shared/utils";
@@ -9,11 +8,15 @@ import {
   signInWithEmailAndPassword,
 } from "../../firebase";
 import { db } from "../../shared/db";
+import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
+import { loginRoute, refreshRoute, registerRoute } from "./doc";
+import { FirebaseError } from "firebase/app";
 
-const app = new Hono();
+const app = new OpenAPIHono();
 const auth = getAuth();
 
-app.post("/register", zValidator("json", registerSchema), async (c) => {
+// TODO: Handle FireBase Errors
+app.openapi(registerRoute, async (c) => {
   const { email, password, name } = c.req.valid("json");
 
   try {
@@ -50,7 +53,7 @@ app.post("/register", zValidator("json", registerSchema), async (c) => {
   }
 });
 
-app.post("/login", zValidator("json", loginSchema), async (c) => {
+app.openapi(loginRoute, async (c) => {
   const { email, password } = c.req.valid("json");
 
   try {
@@ -74,18 +77,24 @@ app.post("/login", zValidator("json", loginSchema), async (c) => {
       })
     );
   } catch (error) {
-    console.error(error);
-    return c.json(
-      r({
-        success: false,
-        message: "Error happened while logging in",
-      }),
-      500
-    );
+    const e = error as FirebaseError;
+    switch (e.code) {
+      case "auth/invalid-credential":
+        return c.json(
+          r({
+            success: false,
+            message: "Invalid credentials",
+          }),
+          401
+        );
+
+      default:
+        throw error;
+    }
   }
 });
 
-app.post("/refresh", zValidator("json", refreshSchema), async (c) => {
+app.openapi(refreshRoute, async (c) => {
   const { refreshToken } = c.req.valid("json");
 
   const URL = "https://securetoken.googleapis.com/v1/token";
