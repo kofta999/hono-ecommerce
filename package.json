@@ -6,8 +6,8 @@
     "@prisma/client": "^5.15.1",
     "firebase": "^10.12.2",
     "firebase-admin": "^12.2.0",
-    "hono": "^4.3.4",
-    "zod": "^3.23.6"
+    "hono": "^4.4.7",
+    "zod": "^3.23.8"
   },
   "prisma": {
     "seed": "tsx prisma/seed/seed.ts",
@@ -19,7 +19,7 @@
     "@snaplet/seed": "^0.97.20",
     "@types/bun": "latest",
     "prisma": "^5.15.1",
-    "tsx": "^4.10.2"
+    "tsx": "^4.15.7"
   },
   "@snaplet/seed": {
     "config": "prisma/seed/seed.config.ts"

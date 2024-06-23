@@ -34,7 +34,7 @@ app.get("/", zValidator("query", productsQuerySchema), async (c) => {
       categoryId: categoryId,
       name: {
         contains: q,
-        mode: "insensitive"
+        mode: "insensitive",
       },
       price: {
         gte: minPrice,
