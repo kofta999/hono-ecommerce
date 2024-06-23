@@ -2,7 +2,12 @@ import { Hono } from "hono";
 import { db } from "../../shared/db";
 import { calculatePagination, r } from "../../shared/utils";
 import { ProductResponse } from "./types";
-import { calculateDiscountedPrice, parseSort, toInt } from "./util";
+import {
+  calculateAverageRate,
+  calculateDiscountedPrice,
+  parseSort,
+  toInt,
+} from "./util";
 import { authorize } from "../../shared/middlewares/authorize";
 import { zValidator } from "../../shared/middlewares/zValidator";
 import { productsQuerySchema } from "./schemas";
@@ -29,8 +34,9 @@ app.get("/", zValidator("query", productsQuerySchema), async (c) => {
     take: perPage,
     skip: perPage * (page - 1),
     include: {
-      category: { select: { name: true } },
+      category: { select: { id: true } },
       discount: { select: { discountPercent: true, active: true } },
+      reviews: { select: { rate: true } },
     },
     where: {
       categoryId: categoryId,
@@ -48,18 +54,29 @@ app.get("/", zValidator("query", productsQuerySchema), async (c) => {
 
   const mappedProds = products.map(
     ({
+      id,
       name,
+      description,
       price,
-      category,
       imageUrl,
+      sizes,
+      categoryId,
+      colors,
+      reviews,
       discount: { active, discountPercent },
       quantity,
     }): ProductResponse => {
+      const rate = calculateAverageRate(reviews);
       const productRes: ProductResponse = {
         name,
         price: price.toNumber(),
         imageUrl,
-        category: category.name,
+        categoryId,
+        id,
+        description,
+        sizes,
+        colors,
+        rate,
       };
 
       if (active) {

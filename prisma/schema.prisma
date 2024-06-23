@@ -15,12 +15,12 @@ datasource db {
 }
 
 model User {
-  id          Int      @id @default(autoincrement())
-  firebaseId  String
-  name        String
+  id         Int      @id @default(autoincrement())
+  firebaseId String
+  name       String
   // phoneNumber String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   userAddress UserAddress[]
   // userPayment UserPayment[]
@@ -104,6 +104,7 @@ model Review {
   userId    Int
   productId Int
   content   String
+  rate      Int
   Product   Product @relation(fields: [productId], references: [id])
   User      User    @relation(fields: [userId], references: [id])
 }

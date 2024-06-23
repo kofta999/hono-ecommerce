@@ -39,3 +39,10 @@ export function parseSort(sort: SortEnum | undefined):
       return undefined;
   }
 }
+
+export function calculateAverageRate(reviews: { rate: number }[]) {
+  const average =
+    reviews.reduce((prev, curr) => prev + curr.rate, 0) / reviews.length;
+
+  return +average.toFixed(1);
+}

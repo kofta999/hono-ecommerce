@@ -1,8 +1,16 @@
+import { Size } from "@prisma/client";
+
 export type ProductResponse = {
+  id: number;
   name: string;
-  imageUrl: string;
+  description: string;
   price: number;
+  imageUrl: string;
+  sizes: Size[];
+  colors: string[];
+
+  rate: number;
   discountedPrice?: number;
   quantity?: number;
-  category: string;
+  categoryId: number;
 };

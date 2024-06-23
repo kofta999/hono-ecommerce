@@ -1,5 +1,3 @@
-import { zValidator } from "../../shared/middlewares/zValidator";
-import { loginSchema, refreshSchema, registerSchema } from "./schemas";
 import { r } from "../../shared/utils";
 import {
   createUserWithEmailAndPassword,
