@@ -52,7 +52,7 @@ app.get("/", zValidator("query", productsQuerySchema), async (c) => {
     orderBy,
   });
 
-  const mappedProds = products.map(
+  let mappedProds = products.map(
     ({
       id,
       name,
@@ -93,6 +93,10 @@ app.get("/", zValidator("query", productsQuerySchema), async (c) => {
       return productRes;
     }
   );
+
+  if (sort === "review-desc") {
+    mappedProds = mappedProds.sort((a, b) => b.rate - a.rate);
+  }
 
   return c.json(
     r({
