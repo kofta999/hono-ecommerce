@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { db } from "../../shared/db";
-import { calculatePagination, r } from "../../shared/utils";
+import { calculatePagination } from "../../shared/utils";
 import { ProductResponse } from "./types";
 import {
   calculateAverageRate,
@@ -98,16 +98,14 @@ app.get("/", zValidator("query", productsQuerySchema), async (c) => {
     mappedProds = mappedProds.sort((a, b) => b.rate - a.rate);
   }
 
-  return c.json(
-    r({
-      success: true,
-      message: "Fetched products",
-      data: {
-        products: mappedProds,
-      },
-      pagination: calculatePagination(page, productsCount, perPage),
-    })
-  );
+  return c.json({
+    success: true,
+    message: "Fetched products",
+    data: {
+      products: mappedProds,
+    },
+    pagination: calculatePagination(page, productsCount, perPage),
+  });
 });
 
 app.get("/:id", async (c) => {
@@ -116,18 +114,16 @@ app.get("/:id", async (c) => {
   const product = await db.product.findUnique({ where: { id: productId } });
 
   if (!product) {
-    return c.json(r({ success: false, message: "Product not found" }), 404);
+    return c.json({ success: false, message: "Product not found" }, 404);
   }
 
-  return c.json(
-    r({
-      success: true,
-      message: "Fetched product successfully",
-      data: {
-        product,
-      },
-    })
-  );
+  return c.json({
+    success: true,
+    message: "Fetched product successfully",
+    data: {
+      product,
+    },
+  });
 });
 
 export default app;

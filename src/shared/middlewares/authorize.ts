@@ -1,6 +1,5 @@
 import { createMiddleware } from "hono/factory";
 import { Env } from "../types/Env";
-import { r } from "../utils";
 import { firebaseAdmin } from "../../firebase";
 
 export const authorize = createMiddleware<Env>(async (c, next) => {
@@ -8,10 +7,10 @@ export const authorize = createMiddleware<Env>(async (c, next) => {
 
   if (!authHeader) {
     return c.json(
-      r({
+      {
         success: false,
         message: "Auth header is not provided",
-      }),
+      },
       401
     );
   }
@@ -20,10 +19,10 @@ export const authorize = createMiddleware<Env>(async (c, next) => {
 
   if (!token) {
     return c.json(
-      r({
+      {
         success: false,
         message: "JWT token is not provided",
-      }),
+      },
       401
     );
   }
@@ -36,10 +35,10 @@ export const authorize = createMiddleware<Env>(async (c, next) => {
     console.error(error);
 
     return c.json(
-      r({
+      {
         success: false,
         message: "Invalid JWT token",
-      }),
+      },
       401
     );
   }
