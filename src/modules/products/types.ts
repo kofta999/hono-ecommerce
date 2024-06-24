@@ -1,16 +1,30 @@
-import { Size } from "@prisma/client";
+import { z } from "@hono/zod-openapi";
 
-export type ProductResponse = {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  imageUrl: string;
-  sizes: Size[];
-  colors: string[];
+// TODO: Keep sizes in sync somehow
 
-  rate: number;
-  discountedPrice?: number;
-  quantity?: number;
-  categoryId: number;
-};
+const SizeZodSchema = z.union([
+  z.literal("SMALL"),
+  z.literal("MEDIUM"),
+  z.literal("L"),
+  z.literal("XL"),
+  z.literal("XXL"),
+  z.literal("XXXL"),
+]);
+
+export const ProductSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  price: z.number(),
+  imageUrl: z.string(),
+  rate: z.number(),
+
+  sizes: z.array(SizeZodSchema).optional(),
+  description: z.string().optional(),
+  colors: z.array(z.string()).optional(),
+
+  discountedPrice: z.number().optional(),
+  quantity: z.number().optional(),
+  categoryId: z.number(),
+});
+
+export type Product = z.infer<typeof ProductSchema>;

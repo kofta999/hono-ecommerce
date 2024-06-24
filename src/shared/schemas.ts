@@ -12,7 +12,6 @@ export const SuccessResponseSchema = z.object({
   success: z.literal<boolean>(true),
   message: z.string(),
   data: z.unknown().optional(),
-  pagination: PaginationSchema.optional(),
 });
 
 export const FailureResponseSchema = z.object({

@@ -32,8 +32,6 @@ export function parseSort(sort: SortEnum | undefined):
       return {
         price: "desc",
       };
-    // case "review-desc":
-    // TODO:
 
     default:
       return undefined;

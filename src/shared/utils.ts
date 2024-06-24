@@ -5,8 +5,13 @@ import {
   PaginationSchema,
 } from "./schemas";
 
-export function genSuccessResponse<T extends ZodTypeAny>(data: T) {
-  return SuccessResponseSchema.extend({ data });
+export function genSuccessResponse<T extends ZodTypeAny>(
+  data: T,
+  pagination = false
+) {
+  const schema = SuccessResponseSchema.extend({ data });
+
+  return pagination ? schema.extend({ pagination: PaginationSchema }) : schema;
 }
 
 export function genFailureResponse(cause: ZodSchema) {

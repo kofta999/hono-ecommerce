@@ -1,22 +1,20 @@
-import { Hono } from "hono";
 import { db } from "../../shared/db";
 import { calculatePagination } from "../../shared/utils";
-import { ProductResponse } from "./types";
+import { Product } from "./types";
 import {
   calculateAverageRate,
   calculateDiscountedPrice,
   parseSort,
   toInt,
 } from "./util";
-import { authorize } from "../../shared/middlewares/authorize";
-import { zValidator } from "../../shared/middlewares/zValidator";
-import { productsQuerySchema } from "./schemas";
+import { OpenAPIHono } from "@hono/zod-openapi";
+import { getProductRoute, getProductsRoute } from "./doc";
 
 const LOW_PRODUCT_QUANTITY = 10;
 
-const app = new Hono();
+const app = new OpenAPIHono();
 
-app.get("/", zValidator("query", productsQuerySchema), async (c) => {
+app.openapi(getProductsRoute, async (c) => {
   const query = c.req.valid("query");
 
   const q = query.q;
@@ -56,26 +54,20 @@ app.get("/", zValidator("query", productsQuerySchema), async (c) => {
     ({
       id,
       name,
-      description,
       price,
       imageUrl,
-      sizes,
       categoryId,
-      colors,
       reviews,
       discount: { active, discountPercent },
       quantity,
-    }): ProductResponse => {
+    }): Product => {
       const rate = calculateAverageRate(reviews);
-      const productRes: ProductResponse = {
+      const productRes: Product = {
         name,
         price: price.toNumber(),
         imageUrl,
         categoryId,
         id,
-        description,
-        sizes,
-        colors,
         rate,
       };
 
@@ -108,20 +100,72 @@ app.get("/", zValidator("query", productsQuerySchema), async (c) => {
   });
 });
 
-app.get("/:id", async (c) => {
+app.openapi(getProductRoute, async (c) => {
   const productId = parseInt(c.req.param("id"));
 
-  const product = await db.product.findUnique({ where: { id: productId } });
+  const product = await db.product.findUnique({
+    where: { id: productId },
+    include: {
+      category: { select: { id: true } },
+      discount: { select: { active: true, discountPercent: true } },
+      reviews: true,
+    },
+  });
 
   if (!product) {
-    return c.json({ success: false, message: "Product not found" }, 404);
+    return c.json(
+      {
+        success: false,
+        message: "Product not found",
+        cause: "Product was not found in the DB",
+      },
+      404
+    );
+  }
+
+  const {
+    id,
+    name,
+    price,
+    imageUrl,
+    categoryId,
+    colors,
+    description,
+    sizes,
+    reviews,
+    discount: { active, discountPercent },
+    quantity,
+  } = product;
+
+  const rate = calculateAverageRate(reviews);
+  const mappedProduct: Product = {
+    name,
+    price: price.toNumber(),
+    imageUrl,
+    categoryId,
+    id,
+    rate,
+    colors,
+    description,
+    sizes,
+  };
+
+  if (active) {
+    mappedProduct.discountedPrice = calculateDiscountedPrice(
+      price.toNumber(),
+      discountPercent.toNumber()
+    );
+  }
+
+  if (quantity <= LOW_PRODUCT_QUANTITY) {
+    mappedProduct.quantity = quantity;
   }
 
   return c.json({
     success: true,
     message: "Fetched product successfully",
     data: {
-      product,
+      product: mappedProduct,
     },
   });
 });
