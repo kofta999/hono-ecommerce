@@ -4,7 +4,7 @@ import productsRouter from "./modules/products";
 import categoriesRouter from "./modules/categories";
 import { errorHandler } from "./shared/middlewares/errorHandler";
 import { OpenAPIHono } from "@hono/zod-openapi";
-import { swaggerUI } from "@hono/swagger-ui";
+import { apiReference } from "@scalar/hono-api-reference";
 import { registerRoute } from "./modules/auth/doc";
 
 const app = new OpenAPIHono();
@@ -16,7 +16,7 @@ app.route("/auth", authRouter);
 app.route("/products", productsRouter);
 app.route("/categories", categoriesRouter);
 
-app.get("/swagger", swaggerUI({ url: "/doc" }));
+app.get("/reference", apiReference({ spec: { url: "/doc" } }));
 
 app.doc("/doc", {
   openapi: "3.0.0",

@@ -1,4 +1,3 @@
-import { r } from "../../shared/utils";
 import {
   createUserWithEmailAndPassword,
   getAuth,
@@ -6,7 +5,7 @@ import {
   signInWithEmailAndPassword,
 } from "../../firebase";
 import { db } from "../../shared/db";
-import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
+import { OpenAPIHono } from "@hono/zod-openapi";
 import { loginRoute, refreshRoute, registerRoute } from "./doc";
 import { FirebaseError } from "firebase/app";
 
@@ -17,38 +16,29 @@ const auth = getAuth();
 app.openapi(registerRoute, async (c) => {
   const { email, password, name } = c.req.valid("json");
 
-  try {
-    const currentUser = await createUserWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
+  const currentUser = await createUserWithEmailAndPassword(
+    auth,
+    email,
+    password
+  );
 
-    const dbUser = await db.user.create({
-      data: { name, firebaseId: currentUser.user.uid },
-    });
+  const dbUser = await db.user.create({
+    data: { name, firebaseId: currentUser.user.uid },
+  });
 
-    sendEmailVerification(currentUser.user).catch((e) => console.log(e));
+  sendEmailVerification(currentUser.user).catch((e) => console.log(e));
 
-    return c.json(
-      r({
-        success: true,
-        message: "User created successfully, verification email sent",
-        data: dbUser.id,
-      })
-    );
-  } catch (error) {
-    console.error(error);
-    const e = error as Error;
-
-    return c.json(
-      r({
-        message: e.message,
-        success: false,
-      }),
-      500
-    );
-  }
+  // TODO: should I return also tokens as firebase already signs the user in?
+  return c.json(
+    {
+      success: true,
+      message: "User created successfully, verification email sent",
+      data: {
+        userId: dbUser.id,
+      },
+    },
+    200
+  );
 });
 
 app.openapi(loginRoute, async (c) => {
@@ -65,24 +55,25 @@ app.openapi(loginRoute, async (c) => {
     const refreshToken = userCredential.user.refreshToken;
 
     return c.json(
-      r({
+      {
         success: true,
         message: "User logged in successfully",
         data: {
           accessToken,
           refreshToken,
         },
-      })
+      },
+      200
     );
   } catch (error) {
     const e = error as FirebaseError;
     switch (e.code) {
       case "auth/invalid-credential":
         return c.json(
-          r({
+          {
             success: false,
             message: "Invalid credentials",
-          }),
+          },
           401
         );
 
@@ -106,28 +97,21 @@ app.openapi(refreshRoute, async (c) => {
   });
 
   if (!res.ok) {
-    return c.json(
-      r({
-        success: false,
-        message: "Error happened while refreshing the token",
-      }),
-      500
-    );
+    throw new Error("Error happened while refreshing token");
   }
 
   const data = await res.json();
 
-  console.log(data);
-
   return c.json(
-    r({
+    {
       success: true,
       message: "Renewed access token",
       data: {
-        accessToken: data.access_token,
-        refreshToken: data.refresh_token,
+        accessToken: data.access_token as string,
+        refreshToken: data.refresh_token as string,
       },
-    })
+    },
+    200
   );
 });
 
