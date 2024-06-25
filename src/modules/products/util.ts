@@ -1,4 +1,8 @@
+import { Decimal } from "@prisma/client/runtime/library";
+import { db } from "../../shared/db";
 import { SortEnum } from "./schemas";
+import { Product } from "./types";
+import { LOW_PRODUCT_QUANTITY } from ".";
 
 export function calculateDiscountedPrice(price: number, discount: number) {
   return price - price * discount;
@@ -43,4 +47,59 @@ export function calculateAverageRate(reviews: { rate: number }[]) {
     reviews.reduce((prev, curr) => prev + curr.rate, 0) / reviews.length;
 
   return +average.toFixed(1);
+}
+
+type MapProduct = {
+  id: number;
+  name: string;
+  price: Decimal;
+  imageUrl: string;
+  categoryId: number;
+  colors?: string[];
+  description?: string;
+  sizes?: any;
+  reviews: { rate: number }[];
+  discount: { active: boolean; discountPercent: Decimal };
+  quantity: number;
+};
+
+export function mapProduct({
+  categoryId,
+  discount: { active, discountPercent },
+  id,
+  imageUrl,
+  name,
+  price,
+  quantity,
+  reviews,
+  colors,
+  description,
+  sizes,
+}: MapProduct) {
+  const rate = calculateAverageRate(reviews);
+
+  const mappedProduct: Product = {
+    name,
+    price: price.toNumber(),
+    imageUrl,
+    categoryId,
+    id,
+    rate,
+    colors,
+    description,
+    sizes,
+  };
+
+  if (active) {
+    mappedProduct.discountedPrice = calculateDiscountedPrice(
+      price.toNumber(),
+      discountPercent.toNumber()
+    );
+  }
+
+  if (quantity && quantity <= LOW_PRODUCT_QUANTITY) {
+    mappedProduct.quantity = quantity;
+  }
+
+  return mappedProduct;
 }

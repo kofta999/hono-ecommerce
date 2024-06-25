@@ -4,13 +4,14 @@ import { Product } from "./types";
 import {
   calculateAverageRate,
   calculateDiscountedPrice,
+  mapProduct,
   parseSort,
   toInt,
 } from "./util";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { getProductRoute, getProductsRoute } from "./doc";
 
-const LOW_PRODUCT_QUANTITY = 10;
+export const LOW_PRODUCT_QUANTITY = 10;
 
 const app = new OpenAPIHono();
 
@@ -50,41 +51,7 @@ app.openapi(getProductsRoute, async (c) => {
     orderBy,
   });
 
-  let mappedProds = products.map(
-    ({
-      id,
-      name,
-      price,
-      imageUrl,
-      categoryId,
-      reviews,
-      discount: { active, discountPercent },
-      quantity,
-    }): Product => {
-      const rate = calculateAverageRate(reviews);
-      const productRes: Product = {
-        name,
-        price: price.toNumber(),
-        imageUrl,
-        categoryId,
-        id,
-        rate,
-      };
-
-      if (active) {
-        productRes.discountedPrice = calculateDiscountedPrice(
-          price.toNumber(),
-          discountPercent.toNumber()
-        );
-      }
-
-      if (quantity <= LOW_PRODUCT_QUANTITY) {
-        productRes.quantity = quantity;
-      }
-
-      return productRes;
-    }
-  );
+  let mappedProds = products.map(mapProduct);
 
   if (sort === "review-desc") {
     mappedProds = mappedProds.sort((a, b) => b.rate - a.rate);
@@ -123,43 +90,7 @@ app.openapi(getProductRoute, async (c) => {
     );
   }
 
-  const {
-    id,
-    name,
-    price,
-    imageUrl,
-    categoryId,
-    colors,
-    description,
-    sizes,
-    reviews,
-    discount: { active, discountPercent },
-    quantity,
-  } = product;
-
-  const rate = calculateAverageRate(reviews);
-  const mappedProduct: Product = {
-    name,
-    price: price.toNumber(),
-    imageUrl,
-    categoryId,
-    id,
-    rate,
-    colors,
-    description,
-    sizes,
-  };
-
-  if (active) {
-    mappedProduct.discountedPrice = calculateDiscountedPrice(
-      price.toNumber(),
-      discountPercent.toNumber()
-    );
-  }
-
-  if (quantity <= LOW_PRODUCT_QUANTITY) {
-    mappedProduct.quantity = quantity;
-  }
+  const mappedProduct = mapProduct(product);
 
   return c.json({
     success: true,

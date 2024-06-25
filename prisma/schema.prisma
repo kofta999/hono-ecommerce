@@ -1,6 +1,5 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
@@ -16,7 +15,7 @@ datasource db {
 
 model User {
   id         Int      @id @default(autoincrement())
-  firebaseId String
+  firebaseId String   @unique
   name       String
   // phoneNumber String
   createdAt  DateTime @default(now())
@@ -25,6 +24,7 @@ model User {
   userAddress UserAddress[]
   // userPayment UserPayment[]
   Review      Review[]
+  Cart        Cart?
 }
 
 model UserAddress {
@@ -69,6 +69,7 @@ model Product {
   discount Discount        @relation(fields: [discountId], references: [id])
   // inventoryId Int      @unique
   // inventory ProductInventory @relation(fields: [inventoryId], references: [id])
+  CartItem CartItem?
 }
 
 model ProductCategory {
@@ -101,26 +102,30 @@ model Discount {
 
 model Review {
   id        Int     @id @default(autoincrement())
-  userId    Int
+  userId    String
   productId Int
   content   String
   rate      Int
   Product   Product @relation(fields: [productId], references: [id])
-  User      User    @relation(fields: [userId], references: [id])
+  User      User    @relation(fields: [userId], references: [firebaseId])
 }
 
 model Cart {
-  id        Int        @id @default(autoincrement())
-  userId    Int
+  id     Int    @id @default(autoincrement())
+  userId String @unique
+
+  user      User       @relation(fields: [userId], references: [firebaseId])
   cartItems CartItem[]
 }
 
 model CartItem {
-  id        Int  @id @default(autoincrement())
-  productId Int
+  id        Int @id @default(autoincrement())
+  productId Int @unique
   cartId    Int
   quantity  Int
-  cart      Cart @relation(fields: [cartId], references: [id])
+
+  cart    Cart    @relation(fields: [cartId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
 }
 
 enum Size {
