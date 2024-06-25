@@ -109,6 +109,20 @@ model Review {
   User      User    @relation(fields: [userId], references: [id])
 }
 
+model Cart {
+  id        Int        @id @default(autoincrement())
+  userId    Int
+  cartItems CartItem[]
+}
+
+model CartItem {
+  id        Int  @id @default(autoincrement())
+  productId Int
+  cartId    Int
+  quantity  Int
+  cart      Cart @relation(fields: [cartId], references: [id])
+}
+
 enum Size {
   SMALL
   MEDIUM
