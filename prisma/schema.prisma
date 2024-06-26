@@ -29,15 +29,14 @@ model User {
 
 model UserAddress {
   id           Int     @id @default(autoincrement())
-  userId       Int
+  userId       String
   addressLine1 String
   addressLine2 String?
   city         String
-  postalCode   String?
   country      String
   phoneNumber  String
 
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [firebaseId])
 }
 
 // model UserPayment {

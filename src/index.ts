@@ -3,6 +3,7 @@ import authRouter from "./modules/auth";
 import productsRouter from "./modules/products";
 import categoriesRouter from "./modules/categories";
 import cartRouter from "./modules/cart";
+import usersRouter from "./modules/users";
 import { errorHandler } from "./shared/middlewares/errorHandler";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { apiReference } from "@scalar/hono-api-reference";
@@ -21,6 +22,7 @@ app.route("/auth", authRouter);
 app.route("/products", productsRouter);
 app.route("/categories", categoriesRouter);
 app.route("/cart", cartRouter);
+app.route("/user", usersRouter);
 
 app.get("/reference", apiReference({ spec: { url: "/doc" } }));
 
