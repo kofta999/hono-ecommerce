@@ -8,9 +8,20 @@ const app = new OpenAPIHono<Env>();
 
 app.openapi(mutateCart, async (c) => {
   const { uid } = c.var.user;
-  const { productId, quantity, type } = c.req.valid("json");
+  const { productId, quantity, type, color, size } = c.req.valid("json");
 
-  const product = await db.product.findUnique({ where: { id: productId } });
+  const product = await db.product.findUnique({
+    where: {
+      id: productId,
+      sizes: {
+        has: size,
+      },
+      colors: {
+        has: color,
+      },
+    },
+    select: { id: true },
+  });
 
   if (!product) {
     return c.json(
@@ -39,7 +50,7 @@ app.openapi(mutateCart, async (c) => {
   const { id } = await db.cart.upsert({
     create: {
       userId: uid,
-      cartItems: { create: { productId, quantity } },
+      cartItems: { create: { productId, quantity, size, color } },
     },
     where: {
       userId: uid,
@@ -47,8 +58,8 @@ app.openapi(mutateCart, async (c) => {
     update: {
       cartItems: {
         upsert: {
-          where: { productId },
-          create: { productId, quantity },
+          where: { productId, size, color },
+          create: { productId, quantity, size, color },
           update: { quantity: op },
         },
       },
@@ -101,6 +112,9 @@ app.get("/", authorize, async (c) => {
     where: { userId: uid },
     include: {
       cartItems: {
+        where: {
+          quantity: { gt: 0 },
+        },
         include: {
           product: true,
         },

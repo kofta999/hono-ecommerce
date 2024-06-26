@@ -1,11 +1,13 @@
 import { z } from "@hono/zod-openapi";
-import { ProductSchema } from "../products/types";
+import { ProductSchema, SizeZodSchema } from "../products/types";
 
 const OperationEnum = z.enum(["inc", "dec", "del"]);
 
 export const MutateCartSchema = z.object({
   productId: z.number(),
   quantity: z.number(),
+  size: SizeZodSchema,
+  color: z.string(),
   type: OperationEnum,
 });
 

@@ -2,7 +2,7 @@ import { z } from "@hono/zod-openapi";
 
 // TODO: Keep sizes in sync somehow
 
-const SizeZodSchema = z.union([
+export const SizeZodSchema = z.union([
   z.literal("SMALL"),
   z.literal("MEDIUM"),
   z.literal("L"),
