@@ -67,3 +67,27 @@ export const getAddressesRoute = createRoute({
     },
   },
 });
+
+export const deleteAddressRoute = createRoute({
+  method: "delete",
+  path: "/address/{id}",
+  middleware: [authorize],
+  request: {
+    params: z.object({ id: z.string() }).refine((v) => !isNaN(Number(v))),
+  },
+  responses: {
+    204: {
+      description: "Deleted the address",
+    },
+    403: {
+      description: "User is unauthorized to delete this address",
+      content: {
+        "application/json": {
+          schema: genFailureResponse(
+            z.literal("User is unauthorized to do this action")
+          ),
+        },
+      },
+    },
+  },
+});

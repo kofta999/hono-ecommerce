@@ -1,7 +1,15 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
-import { addAddressRoute, getAddressesRoute, getUserRoute } from "./doc";
+import {
+  addAddressRoute,
+  deleteAddressRoute,
+  getAddressesRoute,
+  getUserRoute,
+} from "./doc";
 import { Env } from "../../shared/types/Env";
 import { db } from "../../shared/db";
+import { Prisma } from "@prisma/client";
+
+// TODO: Add edit address
 
 const app = new OpenAPIHono<Env>();
 
@@ -73,6 +81,37 @@ app.openapi(getAddressesRoute, async (c) => {
     },
     200
   );
+});
+
+app.openapi(deleteAddressRoute, async (c) => {
+  const { uid } = c.var.user;
+  const id = parseInt(c.req.param("id"));
+
+  try {
+    await db.userAddress.delete({
+      where: {
+        id,
+        userId: uid,
+      },
+    });
+
+    return c.json({}, 204);
+  } catch (e) {
+    if (e instanceof Prisma.PrismaClientKnownRequestError) {
+      if (e.code === "P2025") {
+        return c.json(
+          {
+            success: false,
+            message: "Unauthorized",
+            cause: "User is unauthorized to do this action",
+          },
+          403
+        );
+      }
+    }
+
+    throw e;
+  }
 });
 
 export default app;
