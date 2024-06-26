@@ -34,7 +34,6 @@ app.openapi(getProductsRoute, async (c) => {
     skip: perPage * (page - 1),
     include: {
       category: { select: { id: true } },
-      discount: { select: { discountPercent: true, active: true } },
       reviews: { select: { rate: true } },
     },
     where: {
@@ -74,7 +73,6 @@ app.openapi(getProductRoute, async (c) => {
     where: { id: productId },
     include: {
       category: { select: { id: true } },
-      discount: { select: { active: true, discountPercent: true } },
       reviews: true,
     },
   });

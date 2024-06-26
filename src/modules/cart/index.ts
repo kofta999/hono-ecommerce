@@ -2,6 +2,7 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import { mutateCart, emptyCart } from "./doc";
 import { Env } from "../../shared/types/Env";
 import { db } from "../../shared/db";
+import { authorize } from "../../shared/middlewares/authorize";
 
 const app = new OpenAPIHono<Env>();
 
@@ -19,7 +20,6 @@ app.openapi(mutateCart, async (c) => {
   }
 
   let op;
-
   switch (type) {
     case "inc": {
       op = { increment: quantity };
@@ -91,6 +91,27 @@ app.openapi(emptyCart, async (c) => {
 
   await db.cartItem.deleteMany({ where: { cartId: id } });
   return c.json({}, 204);
+});
+
+// TODO: add API doc
+app.get("/", authorize, async (c) => {
+  const { uid } = c.var.user;
+
+  const cart = await db.cart.findUnique({
+    where: { userId: uid },
+    include: {
+      cartItems: {
+        include: {
+          product: true,
+        },
+      },
+    },
+  });
+
+  return c.json(
+    { success: true, message: "Fetched cart", data: { cart } },
+    200
+  );
 });
 
 export default app;

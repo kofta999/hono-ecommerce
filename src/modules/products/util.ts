@@ -59,13 +59,13 @@ type MapProduct = {
   description?: string;
   sizes?: any;
   reviews: { rate: number }[];
-  discount: { active: boolean; discountPercent: Decimal };
+  discountPercent: number;
   quantity: number;
 };
 
 export function mapProduct({
   categoryId,
-  discount: { active, discountPercent },
+  discountPercent,
   id,
   imageUrl,
   name,
@@ -90,12 +90,10 @@ export function mapProduct({
     sizes,
   };
 
-  if (active) {
-    mappedProduct.discountedPrice = calculateDiscountedPrice(
-      price.toNumber(),
-      discountPercent.toNumber()
-    );
-  }
+  mappedProduct.discountedPrice = calculateDiscountedPrice(
+    price.toNumber(),
+    discountPercent
+  );
 
   if (quantity && quantity <= LOW_PRODUCT_QUANTITY) {
     mappedProduct.quantity = quantity;

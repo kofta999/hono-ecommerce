@@ -49,24 +49,24 @@ model UserAddress {
 // }
 
 model Product {
-  id          Int      @id @default(autoincrement())
-  name        String
-  description String
-  price       Decimal
-  imageUrl    String
-  discountId  Int
-  categoryId  Int
-  quantity    Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt()
-  sizes       Size[]
-  colors      String[]
+  id              Int      @id @default(autoincrement())
+  name            String
+  description     String
+  price           Decimal
+  imageUrl        String
+  discountPercent Int
+  categoryId      Int
+  quantity        Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt()
+  sizes           Size[]
+  colors          String[]
   // Rate
 
   reviews Review[]
 
   category ProductCategory @relation(fields: [categoryId], references: [id])
-  discount Discount        @relation(fields: [discountId], references: [id])
+  // discount Discount        @relation(fields: [discountId], references: [id])
   // inventoryId Int      @unique
   // inventory ProductInventory @relation(fields: [inventoryId], references: [id])
   CartItem CartItem?
@@ -91,14 +91,14 @@ model ProductCategory {
 //   product Product?
 // }
 
-model Discount {
-  id              Int       @id @default(autoincrement())
-  discountPercent Decimal
-  active          Boolean
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt()
-  product         Product[]
-}
+// model Discount {
+//   id              Int       @id @default(autoincrement())
+//   discountPercent Decimal
+//   active          Boolean
+//   createdAt       DateTime  @default(now())
+//   updatedAt       DateTime  @updatedAt()
+//   product         Product[]
+// }
 
 model Review {
   id        Int     @id @default(autoincrement())
