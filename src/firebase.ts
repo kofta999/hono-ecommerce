@@ -19,7 +19,7 @@ const firebaseConfig = {
   appId: process.env.FIREBASE_APP_ID,
 };
 
-const firebase = initializeApp(firebaseConfig);
+initializeApp(firebaseConfig);
 const firebaseAdmin = admin.initializeApp({
   credential: admin.credential.cert(serviceAccount as ServiceAccount),
 });

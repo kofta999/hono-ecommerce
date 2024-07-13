@@ -70,3 +70,11 @@ export const emptyCart = createRoute({
     },
   },
 });
+
+/* const createOrderRoute = createRoute({
+  method: "post",
+  path: "/order",
+  request: {
+
+  }
+}) */
