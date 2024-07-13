@@ -12,7 +12,6 @@ import { FirebaseError } from "firebase/app";
 const app = new OpenAPIHono();
 const auth = getAuth();
 
-// TODO: Handle FireBase Errors
 app.openapi(registerRoute, async (c) => {
   const { email, password, name } = c.req.valid("json");
 
@@ -44,43 +43,26 @@ app.openapi(registerRoute, async (c) => {
 app.openapi(loginRoute, async (c) => {
   const { email, password } = c.req.valid("json");
 
-  try {
-    const userCredential = await signInWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
+  const userCredential = await signInWithEmailAndPassword(
+    auth,
+    email,
+    password
+  );
 
-    const accessToken = await userCredential.user.getIdToken();
-    const refreshToken = userCredential.user.refreshToken;
+  const accessToken = await userCredential.user.getIdToken();
+  const refreshToken = userCredential.user.refreshToken;
 
-    return c.json(
-      {
-        success: true,
-        message: "User logged in successfully",
-        data: {
-          accessToken,
-          refreshToken,
-        },
+  return c.json(
+    {
+      success: true,
+      message: "User logged in successfully",
+      data: {
+        accessToken,
+        refreshToken,
       },
-      200
-    );
-  } catch (error) {
-    const e = error as FirebaseError;
-    switch (e.code) {
-      case "auth/invalid-credential":
-        return c.json(
-          {
-            success: false,
-            message: "Invalid credentials",
-          },
-          401
-        );
-
-      default:
-        throw error;
-    }
-  }
+    },
+    200
+  );
 });
 
 app.openapi(refreshRoute, async (c) => {
