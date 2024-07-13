@@ -47,6 +47,8 @@ Create a `.env` file in the project root directory and add the following environ
 
 This will start the server on the port specified in the `.env` file (defaults to 3000).
 
+2. Access API documentation at `/reference`
+
 ### ERD Diagram
 
 ![prisma-erd](https://github.com/kofta999/hono-ecommerce/assets/99273340/51b3c441-ed33-4da8-93c6-22f519fbeadb)
