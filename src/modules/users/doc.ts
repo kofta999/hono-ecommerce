@@ -4,6 +4,7 @@ import { authorize } from "../../shared/middlewares/authorize";
 import { genFailureResponse, genSuccessResponse } from "../../shared/utils";
 
 export const getUserRoute = createRoute({
+  tags: ["User Management"],
   method: "get",
   path: "/",
   middleware: [authorize],
@@ -28,6 +29,7 @@ export const getUserRoute = createRoute({
 });
 
 export const addAddressRoute = createRoute({
+  tags: ["User Management"],
   method: "post",
   path: "/address",
   middleware: [authorize],
@@ -51,6 +53,7 @@ export const addAddressRoute = createRoute({
 });
 
 export const getAddressesRoute = createRoute({
+  tags: ["User Management"],
   method: "get",
   path: "/address",
   middleware: [authorize],
@@ -69,6 +72,7 @@ export const getAddressesRoute = createRoute({
 });
 
 export const deleteAddressRoute = createRoute({
+  tags: ["User Management"],
   method: "delete",
   path: "/address/{id}",
   middleware: [authorize],

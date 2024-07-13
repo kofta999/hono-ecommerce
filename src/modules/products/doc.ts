@@ -4,6 +4,7 @@ import { genFailureResponse, genSuccessResponse } from "../../shared/utils";
 import { ProductSchema } from "./types";
 
 export const getProductsRoute = createRoute({
+  tags: ["Products Management"],
   method: "get",
   path: "/",
   request: {
@@ -25,6 +26,7 @@ export const getProductsRoute = createRoute({
 });
 
 export const getProductRoute = createRoute({
+  tags: ["Products Management"],
   method: "get",
   path: "/{id}",
   request: {

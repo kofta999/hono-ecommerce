@@ -3,12 +3,12 @@
     "dev": "bun run --hot src/index.ts"
   },
   "dependencies": {
-    "@hono/zod-openapi": "^0.14.5",
-    "@prisma/client": "^5.15.1",
-    "@scalar/hono-api-reference": "^0.5.77",
-    "firebase": "^10.12.2",
+    "@hono/zod-openapi": "^0.14.9",
+    "@prisma/client": "^5.16.2",
+    "@scalar/hono-api-reference": "^0.5.105",
+    "firebase": "^10.12.3",
     "firebase-admin": "^12.2.0",
-    "hono": "^4.4.7",
+    "hono": "^4.4.13",
     "zod": "^3.23.8"
   },
   "prisma": {
@@ -20,8 +20,8 @@
     "@snaplet/copycat": "^5.0.0",
     "@snaplet/seed": "^0.97.20",
     "@types/bun": "latest",
-    "prisma": "^5.15.1",
-    "tsx": "^4.15.7"
+    "prisma": "^5.16.2",
+    "tsx": "^4.16.2"
   },
   "@snaplet/seed": {
     "config": "prisma/seed/seed.config.ts"

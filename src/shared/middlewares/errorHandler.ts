@@ -4,7 +4,7 @@ import { StatusCode } from "hono/utils/http-status";
 
 // Improve error handler
 export const errorHandler: ErrorHandler = (err, c) => {
-  console.error(err.message, err.cause);
+  console.error(err)
 
   if (err instanceof FirebaseError) {
     const { message, code } = firebaseErrorHandler(err)

@@ -14,8 +14,13 @@ export function genSuccessResponse<T extends ZodTypeAny>(
   return pagination ? schema.extend({ pagination: PaginationSchema }) : schema;
 }
 
-export function genFailureResponse(cause: ZodSchema) {
-  return FailureResponseSchema.extend({ cause });
+export function genFailureResponse(cause?: ZodSchema) {
+  if (!cause) {
+    return FailureResponseSchema
+  } else {
+
+    return FailureResponseSchema.extend({ cause });
+  }
 }
 
 export function calculatePagination(

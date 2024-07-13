@@ -7,7 +7,6 @@ import {
 import { db } from "../../shared/db";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { loginRoute, refreshRoute, registerRoute } from "./doc";
-import { FirebaseError } from "firebase/app";
 
 const app = new OpenAPIHono();
 const auth = getAuth();

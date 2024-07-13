@@ -1,8 +1,9 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import { loginSchema, refreshSchema, registerSchema } from "./schemas";
-import { genSuccessResponse } from "../../shared/utils";
+import { genFailureResponse, genSuccessResponse } from "../../shared/utils";
 
 export const registerRoute = createRoute({
+  tags: ["Authentication"],
   method: "post",
   path: "/register",
   request: {
@@ -21,10 +22,19 @@ export const registerRoute = createRoute({
         },
       },
     },
+    409: {
+      description: "Indicates that a user alerady exists with that email",
+      content: {
+        "application/json": {
+          schema: genFailureResponse()
+        }
+      }
+    }
   },
 });
 
 export const loginRoute = createRoute({
+  tags: ["Authentication"],
   method: "post",
   path: "/login",
   request: {
@@ -42,15 +52,21 @@ export const loginRoute = createRoute({
             })
           ),
         },
-      },
+      }
     },
     401: {
-      description: "Invalid credentials",
+      description: "Indicates that the login credentials are invalid",
+      content: {
+        "application/json": {
+          schema: genFailureResponse()
+        }
+      }
     },
   },
 });
 
 export const refreshRoute = createRoute({
+  tags: ["Authentication"],
   method: "post",
   path: "/refresh",
   request: {

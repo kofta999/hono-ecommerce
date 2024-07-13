@@ -5,6 +5,7 @@ import { authorize } from "../../shared/middlewares/authorize";
 import { ProductSchema } from "../products/types";
 
 export const mutateCart = createRoute({
+  tags: ["Cart Management"],
   method: "post",
   path: "/",
   request: {
@@ -44,6 +45,7 @@ export const mutateCart = createRoute({
 });
 
 export const emptyCart = createRoute({
+  tags: ["Cart Management"],
   method: "delete",
   path: "/{id}",
   request: {
@@ -72,6 +74,7 @@ export const emptyCart = createRoute({
 });
 
 /* const createOrderRoute = createRoute({
+  tags: ["Cart Management"],
   method: "post",
   path: "/order",
   request: {
