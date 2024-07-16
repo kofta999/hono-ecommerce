@@ -1,5 +1,5 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
-import { mutateCart, emptyCart } from "./doc";
+import { mutateCart, emptyCart, createOrderRoute, getCart } from "./doc";
 import { Env } from "../../shared/types/Env";
 import { db } from "../../shared/db";
 import { authorize } from "../../shared/middlewares/authorize";
@@ -104,8 +104,7 @@ app.openapi(emptyCart, async (c) => {
   return c.json({}, 204);
 });
 
-// TODO: add API doc
-app.get("/", authorize, async (c) => {
+app.openapi(getCart, async (c) => {
   const { uid } = c.var.user;
 
   const cart = await db.cart.findUnique({
@@ -116,7 +115,14 @@ app.get("/", authorize, async (c) => {
           quantity: { gt: 0 },
         },
         include: {
-          product: true,
+          product: {
+            select: {
+              id: true,
+              name: true,
+              price: true,
+              imageUrl: true,
+            }
+          },
         },
       },
     },
@@ -128,4 +134,6 @@ app.get("/", authorize, async (c) => {
   );
 });
 
+
 export default app;
+

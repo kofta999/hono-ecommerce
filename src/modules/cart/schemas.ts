@@ -16,6 +16,8 @@ const CartProductSchema = ProductSchema.omit({
   quantity: true,
   rate: true,
   categoryId: true,
+  sizes: true,
+  colors: true,
 });
 
 export const CartItemSchema = z.object({
@@ -23,5 +25,11 @@ export const CartItemSchema = z.object({
   quantity: z.number(),
   product: CartProductSchema,
 });
+
+export const CartSchema = z.object({
+  id: z.number(),
+  userId: z.string(),
+  cartItems: z.array(CartItemSchema)
+})
 
 export type CartProduct = z.infer<typeof CartProductSchema>;

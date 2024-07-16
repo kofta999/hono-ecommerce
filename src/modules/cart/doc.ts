@@ -1,8 +1,9 @@
 import { createRoute, z } from "@hono/zod-openapi";
-import { CartItemSchema, MutateCartSchema } from "./schemas";
+import { CartItemSchema, CartSchema, MutateCartSchema } from "./schemas";
 import { genFailureResponse, genSuccessResponse } from "../../shared/utils";
 import { authorize } from "../../shared/middlewares/authorize";
 import { ProductSchema } from "../products/types";
+import { auth } from "firebase-admin";
 
 export const mutateCart = createRoute({
   tags: ["Cart Management"],
@@ -73,11 +74,24 @@ export const emptyCart = createRoute({
   },
 });
 
-/* const createOrderRoute = createRoute({
-  tags: ["Cart Management"],
-  method: "post",
-  path: "/order",
-  request: {
 
+export const getCart = createRoute({
+  tags: ["Cart Managment"],
+  method: "get",
+  path: "/",
+  middleware: [authorize],
+  security: [
+    { Bearer: [] }
+  ],
+  responses: {
+    200: {
+      description: "Gets cart data",
+      // content: {
+      //   "application/json": {
+      //     schema: CartSchema
+      //   }
+      // }
+    }
   }
-}) */
+})
+
